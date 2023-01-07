@@ -1,5 +1,7 @@
-let Musicas: Musica[] = []
-let Playlists: Playlist[] = []
+//let Musicas: Musica[] = []
+//let Playlists: Playlist[] = []
+let musicasDisponiveis: Musica[] = []
+let UsuariosExistentes: Usuario[] = []
 
 // 1. Criar uma classe pessoa que possui as propriedades nome e data de
 // nascimento.
@@ -42,18 +44,27 @@ class Autor extends Pessoa {
 class Usuario extends Pessoa {
     NomeDeUsuario: string
     Senha: string
-    Playlist: Playlist
-    constructor(nome: string, dataDeNascimento: string, nomeDeUsuario: string, senha: string, playlist: Playlist) {
+    PlaylistUsuario: Playlist[] = []
+    constructor(nome: string, dataDeNascimento: string, nomeDeUsuario: string, senha: string) {
         super(nome, dataDeNascimento)
         this.setNomeDeUsuario(nomeDeUsuario)
         this.setSenha(senha)
-        this.Playlist = playlist
     }
 
     setNomeDeUsuario(nomeDeUsuario: string) {
-        nomeDeUsuario = prompt("Insira o nome de Usuário, (O nome de usuario não pode conter caracteres especiais, apenas letras, números e underline)")
-        nomeDeUsuario.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, '')
-        this.NomeDeUsuario = nomeDeUsuario
+        //nomeDeUsuario.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, '') 
+        let regex2 = /\W|_/
+        let continuar = true
+        while (continuar) {
+            if (regex2.test(nomeDeUsuario) == true) {
+                console.log("O nome de usuario não pode conter caracteres especiais, apenas letras, números e underline")
+                nomeDeUsuario = prompt("Insira o nome de Usuário, (O nome de usuario não pode conter caracteres especiais, apenas letras, números e underline)")
+            } else {
+                this.NomeDeUsuario = nomeDeUsuario
+                console.log("Nome de usuário válido")
+                continuar = false
+            }
+        }
     }
 
     setSenha(senha: string) {
@@ -75,6 +86,16 @@ class Usuario extends Pessoa {
             }
         }
     }
+
+    CriarPlaylist(): void {
+        let nomePlaylist = prompt("Insira o nome da Playlist")
+        let dataCriacao = prompt("Insira a data de criação da Playlist")
+        let playlistNova = new Playlist(nomePlaylist, dataCriacao)
+
+        this.PlaylistUsuario.push(playlistNova)
+        console.log("Playlist criada com sucesso")
+
+    }
 }
 
 // 4. Criar a classe música que possui as propriedades nome, autor e duração(em
@@ -90,7 +111,7 @@ class Musica {
         this.setDuracao(duracao)
     }
 
-    setDuracao(duracao:number){
+    setDuracao(duracao: number) {
         let continuar = true
         while (continuar) {
             if (duracao > 10) {
@@ -112,19 +133,18 @@ class Musica {
 class Playlist {
     Nome: string
     DataDeCriacao: string
-    Musicas: Musica
-    constructor(nome: string, dataDeCriacao: string, musicas: Musica) {
+    Musicas: Musica[] = []
+    constructor(nome: string, dataDeCriacao: string) {
         this.Nome = nome
         this.DataDeCriacao = dataDeCriacao
-        this.Musicas = musicas
     }
 
     AdicionarMusica(musica: Musica) {
-        for (let index = 0; index < Musicas.length; index++) {
-            if (musica.Nome == Musicas[index].Nome) {
+        for (let index = 0; index < this.Musicas.length; index++) {
+            if (musica.Nome == this.Musicas[index].Nome) {
                 alert("Esta música ja existe na playlist, escolha outra!")
             } else {
-                Musicas.push(musica)
+                this.Musicas.push(musica)
                 console.log("Música adicionada com sucesso")
             }
         }
@@ -137,4 +157,91 @@ class Playlist {
 // números e underline
 //ok - A senha do usuário deve conter pelo menos um número e um caractere
 // especial
-// - Uma música não pode ter duração maior que 10 minutos
+//ok - Uma música não pode ter duração maior que 10 minutos
+
+let musica1 = new Musica("Vida Chique", "Veigh FT. Kaash Paige", 3.30)
+musicasDisponiveis.push(musica1)
+let musica2 = new Musica("Paz e Dim 2", "Argollo", 2.29)
+musicasDisponiveis.push(musica2)
+let musica3 = new Musica("A Morte do Autotune", "Matuê", 4.14)
+musicasDisponiveis.push(musica3)
+let musica4 = new Musica("Filha de Jornalista", "MC IG", 3.18)
+musicasDisponiveis.push(musica4)
+let musica5 = new Musica("Tiguan", "Argollo e T.A", 2.36)
+musicasDisponiveis.push(musica5)
+
+function CriarPessoa(): Pessoa {
+    let nomePessoa = prompt("Insira aqui o nome da pessoa")
+    let dataNascimentoPessoa = prompt("Insira aqui a data de nascimento da pessoa")
+    return new Pessoa(nomePessoa, dataNascimentoPessoa)
+}
+
+function CriarAutor(): Autor {
+    let nomeAutor = prompt("Insira aqui o nome do Autor")
+    let dataNascimentoAutor = prompt("Insira aqui a data de nascimento do Autor")
+    let nomeArtisticoAutor = prompt("Insira aqui o nome Artístico do Autor")
+    return new Autor(nomeAutor, dataNascimentoAutor, nomeArtisticoAutor)
+}
+
+function CriarUsuario(): void {
+    let nomePessoa = prompt("Insira aqui o nome da pessoa")
+    let dataNascimentoUsuario = prompt("Insira aqui a data de nascimento da pessoa")
+    let nomeUsuario = prompt("Insira aqui o nome de Usuário")
+    let senha = prompt("Insira aqui a senha")
+    let novoUser = new Usuario(nomePessoa, dataNascimentoUsuario, nomeUsuario, senha)
+    UsuariosExistentes.push(novoUser)
+}
+
+function CriarMusica(): Musica {
+    let nomeMusica = prompt("Insira o nome da música")
+    let autorMusica = prompt("Insira o Autor da música")
+    let duracaoMusica = parseInt(prompt("Insira a duração em minutos da música"))
+    let musicaD = new Musica(nomeMusica, autorMusica, duracaoMusica)
+
+    for (let index = 0; index < musicasDisponiveis.length; index++) {
+        if (musicaD.Nome == musicasDisponiveis[index].Nome) {
+            alert("Esta música ja existe na na lista de músicas disponíveis, escolha outra!")
+        } else {
+            musicasDisponiveis.push(musicaD)
+            console.log("Música adicionada com sucesso na lista de Músicas disponíveis")
+            return musicaD
+        }
+    }
+}
+
+let continuar = true
+while (continuar) {
+    let opcao = prompt("Insira uma opcao para continuar!, Para criar uma pessoa(1), Para criar um autor(2), Para criar um Usuário(3), Para Criar uma Música(4), Para criar uma playlist(5), Para mostrar as músicas existentes(6)")
+    switch (opcao) {
+        case "1":
+            CriarPessoa()
+            break;
+        case "2":
+            CriarAutor()
+            break;
+        case "3":
+            CriarUsuario()
+            break;
+        case "4":
+            CriarMusica()
+            break;
+        case "5":
+            let usernome = prompt("Insira o nome do usuário que queria criar a playlist")
+            for (let index = 0; index < UsuariosExistentes.length; index++) {
+                if(usernome == UsuariosExistentes[index].NomeDeUsuario){
+                    UsuariosExistentes[index].CriarPlaylist()
+                }
+            }
+            break;
+        case "6":
+            console.log(musicasDisponiveis)
+            break;
+        default:
+            console.log("Opção inválida")
+            break;
+    }
+    let novamente = prompt("Deseja continuar executando? s ou n")
+    if (novamente != "s") {
+        continuar = false
+    }
+}

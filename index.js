@@ -13,7 +13,10 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var Musicas = [];
+//let Musicas: Musica[] = []
+//let Playlists: Playlist[] = []
+var musicasDisponiveis = [];
+var UsuariosExistentes = [];
 // 1. Criar uma classe pessoa que possui as propriedades nome e data de
 // nascimento.
 var Pessoa = /** @class */ (function () {
@@ -48,16 +51,30 @@ var Autor = /** @class */ (function (_super) {
     return Autor;
 }(Pessoa));
 // 3. Criar a classe usuário que possui as propriedades usuario, senha e playlists
-var Usuario = /** @class */ (function () {
-    function Usuario(nomeDeUsuario, senha, playlist) {
-        this.setNomeDeUsuario(nomeDeUsuario);
-        this.setSenha(senha);
-        this.Playlist = playlist;
+var Usuario = /** @class */ (function (_super) {
+    __extends(Usuario, _super);
+    function Usuario(nome, dataDeNascimento, nomeDeUsuario, senha) {
+        var _this = _super.call(this, nome, dataDeNascimento) || this;
+        _this.PlaylistUsuario = [];
+        _this.setNomeDeUsuario(nomeDeUsuario);
+        _this.setSenha(senha);
+        return _this;
     }
     Usuario.prototype.setNomeDeUsuario = function (nomeDeUsuario) {
-        nomeDeUsuario = prompt("Insira o nome de Usuário, (O nome de usuario não pode conter caracteres especiais, apenas letras, números e underline)");
-        nomeDeUsuario.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, '');
-        this.NomeDeUsuario = nomeDeUsuario;
+        //nomeDeUsuario.replace(/([\u0300-\u036f]|[^0-9a-zA-Z])/g, '') 
+        var regex2 = /\W|_/;
+        var continuar = true;
+        while (continuar) {
+            if (regex2.test(nomeDeUsuario) == true) {
+                console.log("O nome de usuario não pode conter caracteres especiais, apenas letras, números e underline");
+                nomeDeUsuario = prompt("Insira o nome de Usuário, (O nome de usuario não pode conter caracteres especiais, apenas letras, números e underline)");
+            }
+            else {
+                this.NomeDeUsuario = nomeDeUsuario;
+                console.log("Nome de usuário válido");
+                continuar = false;
+            }
+        }
     };
     Usuario.prototype.setSenha = function (senha) {
         var regex = /[0-9]/;
@@ -80,8 +97,15 @@ var Usuario = /** @class */ (function () {
             }
         }
     };
+    Usuario.prototype.CriarPlaylist = function () {
+        var nomePlaylist = prompt("Insira o nome da Playlist");
+        var dataCriacao = prompt("Insira a data de criação da Playlist");
+        var playlistNova = new Playlist(nomePlaylist, dataCriacao);
+        this.PlaylistUsuario.push(playlistNova);
+        console.log("Playlist criada com sucesso");
+    };
     return Usuario;
-}());
+}(Pessoa));
 // 4. Criar a classe música que possui as propriedades nome, autor e duração(em
 // minutos).
 var Musica = /** @class */ (function () {
@@ -110,18 +134,18 @@ var Musica = /** @class */ (function () {
 // na playlist antes de adicionar e exibir no console se a música foi adicionada ou
 // se já existia na playlist.
 var Playlist = /** @class */ (function () {
-    function Playlist(nome, dataDeCriacao, musicas) {
+    function Playlist(nome, dataDeCriacao) {
+        this.Musicas = [];
         this.Nome = nome;
         this.DataDeCriacao = dataDeCriacao;
-        this.Musicas = musicas;
     }
     Playlist.prototype.AdicionarMusica = function (musica) {
-        for (var index = 0; index < Musicas.length; index++) {
-            if (musica.Nome == Musicas[index].Nome) {
+        for (var index = 0; index < this.Musicas.length; index++) {
+            if (musica.Nome == this.Musicas[index].Nome) {
                 alert("Esta música ja existe na playlist, escolha outra!");
             }
             else {
-                Musicas.push(musica);
+                this.Musicas.push(musica);
                 console.log("Música adicionada com sucesso");
             }
         }
@@ -134,4 +158,85 @@ var Playlist = /** @class */ (function () {
 // números e underline
 //ok - A senha do usuário deve conter pelo menos um número e um caractere
 // especial
-// - Uma música não pode ter duração maior que 10 minutos
+//ok - Uma música não pode ter duração maior que 10 minutos
+var musica1 = new Musica("Vida Chique", "Veigh FT. Kaash Paige", 3.30);
+musicasDisponiveis.push(musica1);
+var musica2 = new Musica("Paz e Dim 2", "Argollo", 2.29);
+musicasDisponiveis.push(musica2);
+var musica3 = new Musica("A Morte do Autotune", "Matuê", 4.14);
+musicasDisponiveis.push(musica3);
+var musica4 = new Musica("Filha de Jornalista", "MC IG", 3.18);
+musicasDisponiveis.push(musica4);
+var musica5 = new Musica("Tiguan", "Argollo e T.A", 2.36);
+musicasDisponiveis.push(musica5);
+function CriarPessoa() {
+    var nomePessoa = prompt("Insira aqui o nome da pessoa");
+    var dataNascimentoPessoa = prompt("Insira aqui a data de nascimento da pessoa");
+    return new Pessoa(nomePessoa, dataNascimentoPessoa);
+}
+function CriarAutor() {
+    var nomeAutor = prompt("Insira aqui o nome do Autor");
+    var dataNascimentoAutor = prompt("Insira aqui a data de nascimento do Autor");
+    var nomeArtisticoAutor = prompt("Insira aqui o nome Artístico do Autor");
+    return new Autor(nomeAutor, dataNascimentoAutor, nomeArtisticoAutor);
+}
+function CriarUsuario() {
+    var nomePessoa = prompt("Insira aqui o nome da pessoa");
+    var dataNascimentoUsuario = prompt("Insira aqui a data de nascimento da pessoa");
+    var nomeUsuario = prompt("Insira aqui o nome de Usuário");
+    var senha = prompt("Insira aqui a senha");
+    var novoUser = new Usuario(nomePessoa, dataNascimentoUsuario, nomeUsuario, senha);
+    UsuariosExistentes.push(novoUser);
+}
+function CriarMusica() {
+    var nomeMusica = prompt("Insira o nome da música");
+    var autorMusica = prompt("Insira o Autor da música");
+    var duracaoMusica = parseInt(prompt("Insira a duração em minutos da música"));
+    var musicaD = new Musica(nomeMusica, autorMusica, duracaoMusica);
+    for (var index = 0; index < musicasDisponiveis.length; index++) {
+        if (musicaD.Nome == musicasDisponiveis[index].Nome) {
+            alert("Esta música ja existe na na lista de músicas disponíveis, escolha outra!");
+        }
+        else {
+            musicasDisponiveis.push(musicaD);
+            console.log("Música adicionada com sucesso na lista de Músicas disponíveis");
+            return musicaD;
+        }
+    }
+}
+var continuar = true;
+while (continuar) {
+    var opcao = prompt("Insira uma opcao para continuar!, Para criar uma pessoa(1), Para criar um autor(2), Para criar um Usuário(3), Para Criar uma Música(4), Para criar uma playlist(5), Para mostrar as músicas existentes(6)");
+    switch (opcao) {
+        case "1":
+            CriarPessoa();
+            break;
+        case "2":
+            CriarAutor();
+            break;
+        case "3":
+            CriarUsuario();
+            break;
+        case "4":
+            CriarMusica();
+            break;
+        case "5":
+            var usernome = prompt("Insira o nome do usuário que queria criar a playlist");
+            for (var index = 0; index < UsuariosExistentes.length; index++) {
+                if (usernome == UsuariosExistentes[index].NomeDeUsuario) {
+                    UsuariosExistentes[index].CriarPlaylist();
+                }
+            }
+            break;
+        case "6":
+            console.log(musicasDisponiveis);
+            break;
+        default:
+            console.log("Opção inválida");
+            break;
+    }
+    var novamente = prompt("Deseja continuar executando? s ou n");
+    if (novamente != "s") {
+        continuar = false;
+    }
+}
