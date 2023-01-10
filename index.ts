@@ -139,13 +139,14 @@ class Playlist {
         this.DataDeCriacao = dataDeCriacao
     }
 
-    AdicionarMusica(musica: Musica) {
-        for (let index = 0; index < this.Musicas.length; index++) {
-            if (musica.Nome == this.Musicas[index].Nome) {
+    AdicionarMusica(nomeMusica: string, musicasDisponiveis: Musica[] = []) {
+        console.log(musicasDisponiveis)
+        for (let index = 0; index < musicasDisponiveis.length; index++) {
+            if (nomeMusica == this.Musicas[index].Nome) {
                 alert("Esta música ja existe na playlist, escolha outra!")
-            } else {
-                this.Musicas.push(musica)
-                console.log("Música adicionada com sucesso")
+            } else if (nomeMusica == musicasDisponiveis[index].Nome) {
+                this.Musicas.push(musicasDisponiveis[index])
+                console.log("Música adicionada na playlist com sucesso")
             }
         }
     }
@@ -183,13 +184,23 @@ function CriarAutor(): Autor {
     return new Autor(nomeAutor, dataNascimentoAutor, nomeArtisticoAutor)
 }
 
-function CriarUsuario(): void {
+function CriarUsuario(): Usuario {
     let nomePessoa = prompt("Insira aqui o nome da pessoa")
     let dataNascimentoUsuario = prompt("Insira aqui a data de nascimento da pessoa")
     let nomeUsuario = prompt("Insira aqui o nome de Usuário")
     let senha = prompt("Insira aqui a senha")
     let novoUser = new Usuario(nomePessoa, dataNascimentoUsuario, nomeUsuario, senha)
+    let opcao2 = prompt("Deseja criar uma playlist? s ou n")
+    if (opcao2 == "s") {
+        novoUser.CriarPlaylist()
+    }
+    let opcao3 = prompt("Deseja adicionar uma música na playlist? s ou n")
+    if (opcao3 == "s") {
+        let nomeMusica2 = prompt("Insira o nome da musica")
+        novoUser.PlaylistUsuario[0].AdicionarMusica(nomeMusica2)
+    }
     UsuariosExistentes.push(novoUser)
+    return novoUser
 }
 
 function CriarMusica(): Musica {
@@ -209,9 +220,83 @@ function CriarMusica(): Musica {
     }
 }
 
+
+
+
+function RetornarUsuarios() {
+    return fetch('https://apigenerator.dronahq.com/api/5tL7WcmB/usuarios')
+        .then((response) => response.json())
+        .then((data) => console.log(data));
+}
+
+async function GetData(id: string) {
+    const response = await fetch("https://apigenerator.dronahq.com/api/5tL7WcmB/usuarios/" + id, {
+        method: 'GET', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    })
+        .then((response) => response.json())
+        .then((data) => console.log(data));
+}
+
+async function PostData() {
+    let data = CriarUsuario()
+    const response = await fetch("https://apigenerator.dronahq.com/api/5tL7WcmB/usuarios", {
+        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify(data)
+    });
+    return response.json();
+}
+
+async function PutData(id: string) {
+    let data2 = CriarUsuario()
+    const response = await fetch("https://apigenerator.dronahq.com/api/5tL7WcmB/usuarios/" + id, {
+        method: 'PUT', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        body: JSON.stringify(data2)
+    });
+    return response.json();
+}
+
+async function DeleteData(id: string) {
+    const response = await fetch("https://apigenerator.dronahq.com/api/5tL7WcmB/usuarios/" + id, {
+        method: 'DELETE', // *GET, POST, PUT, DELETE, etc.
+        mode: 'cors',
+        cache: 'no-cache',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer'
+    });
+    return response.json();
+}
+
 let continuar = true
 while (continuar) {
-    let opcao = prompt("Insira uma opcao para continuar!, Para criar uma pessoa(1), Para criar um autor(2), Para criar um Usuário(3), Para Criar uma Música(4), Para criar uma playlist(5), Para mostrar as músicas existentes(6)")
+    let opcao = prompt("Insira uma opcao para continuar!, Para criar uma pessoa(1), Para criar um autor(2), Para criar um Usuário(3), Para Criar uma Música(4), Para criar uma playlist(5), Para mostrar as músicas existentes(6), Para retornar todos Usuários(7), Para retornar um usuário por ID(8), Para alteral a informação de um usuário(9), Para deletar um usuário(10)")
     switch (opcao) {
         case "1":
             CriarPessoa()
@@ -220,21 +305,36 @@ while (continuar) {
             CriarAutor()
             break;
         case "3":
-            CriarUsuario()
+            PostData()
             break;
         case "4":
             CriarMusica()
             break;
         case "5":
-            let usernome = prompt("Insira o nome do usuário que queria criar a playlist")
+            let usernome = prompt("Insira o nome do usuário que queira criar a playlist")
             for (let index = 0; index < UsuariosExistentes.length; index++) {
-                if(usernome == UsuariosExistentes[index].NomeDeUsuario){
+                if (usernome == UsuariosExistentes[index].NomeDeUsuario) {
                     UsuariosExistentes[index].CriarPlaylist()
                 }
             }
             break;
         case "6":
             console.log(musicasDisponiveis)
+            break;
+        case "7":
+            RetornarUsuarios()
+            break;
+        case "8":
+            let idUsuario = prompt("Insira o ID do usuário que queira solicitar")
+            GetData(idUsuario)
+            break;
+        case "9":
+            let idAlterarUsuario = prompt("Insira o ID do usuário que queira solicitar")
+            PutData(idAlterarUsuario)
+            break;
+        case "10":
+            let idDeletarUsuario = prompt("Insira o ID do usuário que queira solicitar")
+            DeleteData(idDeletarUsuario)
             break;
         default:
             console.log("Opção inválida")
@@ -245,3 +345,24 @@ while (continuar) {
         continuar = false
     }
 }
+
+// 1. Com base no exercício anterior implemente as APIs: GET, GET by ID, POST,
+// PUT e DELETE usando typescript, consumindo a API criada no dronahq
+// (url:"https://apigenerator.dronahq.com/api/5tL7WcmB/usuarios")
+
+// 2. Crie uma função que retorne a lista de todos os usuários;
+
+// 3. Crie uma função que recebe como parâmetro o id de um usuário e retorna
+// suas informações
+
+// 4. Crie uma função para adicionar um usuário e solicite essas informações ao
+// usuário;
+
+// 5. Crie uma função para alterar o nome de um usuário, essa função deve receber
+// como parâmetro o id do usuário e o objeto desse usuário com o valor alterado;
+
+// 6. Crie uma função para excluir um usuário, essa função deve solicitar ao usuário
+// o id do usuário que deseja excluir;
+
+// 7. Organize a execução do código dando a opção para o usuário do que ele
+// deseja fazer e solicitando as informações necessárias.
